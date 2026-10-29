@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מערכת הכנה מתקדמת - רשתות תקשורת מחשבים (20948)</title>
+    <title>מערכת הכנה מקיפה - רשתות תקשורת מחשבים (20948)</title>
     <style>
         :root {
             --primary: #1e3a8a;
-            --secondary: #3b82f6;
-            --accent: #10b981;
-            --danger: #ef4444;
+            --secondary: #2563eb;
+            --accent: #059669;
+            --danger: #dc2626;
             --bg: #f8fafc;
             --card-bg: #ffffff;
-            --text: #1e293b;
-            --border: #e2e8f0;
+            --text: #0f172a;
+            --border: #cbd5e1;
         }
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -77,33 +77,61 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
-        /* Study Plan Styles */
+        /* Interactive Study Plan Grid */
         .plan-grid {
             display: grid;
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
         }
         .day-card {
-            border-right: 5px solid var(--secondary);
+            border-right: 6px solid var(--secondary);
             background: white;
-            padding: 1rem 1.25rem;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            padding: 1.25rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
-        .day-card h3 { margin-top: 0; color: var(--primary); }
+        .day-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            border-right-color: var(--accent);
+        }
+        .day-card h3 { margin-top: 0; color: var(--primary); font-size: 1.2rem; }
+        .day-card p { font-size: 0.95rem; color: #475569; }
+        .day-card .btn-go {
+            margin-top: 1rem;
+            align-self: flex-start;
+            background: #eff6ff;
+            color: var(--secondary);
+            border: 1px solid #bfdbfe;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
 
-        /* Quiz Styles */
+        /* Filter & Quiz Styles */
         .filter-bar {
             display: flex;
             gap: 15px;
             margin-bottom: 1.5rem;
             align-items: center;
             flex-wrap: wrap;
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            border: 1px solid var(--border);
         }
         .filter-bar select {
-            padding: 0.5rem;
+            padding: 0.6rem;
             border-radius: 6px;
             border: 1px solid var(--border);
             font-size: 1rem;
+            font-family: inherit;
         }
         
         .question-box {
@@ -118,7 +146,7 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1rem;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #64748b;
         }
         .badge {
@@ -128,14 +156,16 @@
             border-radius: 999px;
             font-weight: 600;
         }
+        .badge.open-q {
+            background: #fef3c7;
+            color: #92400e;
+        }
         .options-list {
             list-style: none;
             padding: 0;
             margin: 1rem 0;
         }
-        .options-list li {
-            margin-bottom: 0.5rem;
-        }
+        .options-list li { margin-bottom: 0.5rem; }
         .options-list label {
             display: flex;
             align-items: center;
@@ -157,6 +187,7 @@
             margin-top: 0.5rem;
             font-family: inherit;
             box-sizing: border-box;
+            font-size: 0.95rem;
         }
         
         .btn {
@@ -170,13 +201,14 @@
             transition: background 0.2s;
             margin-top: 1rem;
         }
-        .btn:hover { background: #1d4ed8; }
+        .btn:hover { background: var(--secondary); }
 
         .feedback {
             margin-top: 1rem;
             padding: 1rem;
             border-radius: 8px;
             display: none;
+            line-height: 1.7;
         }
         .feedback.correct { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
         .feedback.incorrect { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
@@ -202,50 +234,61 @@
 
 <header>
     <h1>רשתות תקשורת מחשבים (20948)</h1>
-    <p>מערכת אימון מקיפה לרמת 100 – מוכנות מוחלטת למבחן</p>
+    <p>מערכת הכנה מקיפה לרמת 100 – כולל כל מבחני העבר ותרגול אינטראקטיבי לפי נושאים</p>
 </header>
 
 <div class="container">
     <div class="nav-tabs">
-        <button class="tab-btn active" onclick="switchTab('plan')">תוכנית לימודים (30 יום)</button>
-        <button class="tab-btn" onclick="switchTab('quiz')">מאגר שאלות ותרגול</button>
-        <button class="tab-btn" onclick="switchTab('stats')">מעקב ציונים והתקדמות</button>
+        <button class="tab-btn active" id="tab-plan-btn" onclick="switchTab('plan')">תוכנית לימודים אינטראקטיבית</button>
+        <button class="tab-btn" id="tab-quiz-btn" onclick="switchTab('quiz')">מאגר שאלות ותרגול</button>
+        <button class="tab-btn" id="tab-stats-btn" onclick="switchTab('stats')">מעקב ציונים והתקדמות</button>
     </div>
 
-    <!-- Study Plan Tab -->
+    <!-- Interactive Study Plan Tab -->
     <div id="plan" class="section-content active">
         <div class="card">
-            <h2>תוכנית עבודה ממוקדת לציון 100 ב-30 יום</h2>
-            <p>התוכנית בנויה כך שתעבור באופן שיטתי על כל נושאי הלימוד, תפתור מבחני עבר, ותסגור פינות עד לרמת שליטה מוחלטת.</p>
+            <h2>תוכנית אימונים ממוקדת לפי נושאי הבחינה</h2>
+            <p>לחץ על כל אחד מהימים/המודולים למטה כדי לעבור ישירות לתרגול שאלות ברמת מבחן מאותו הנושא!</p>
         </div>
         <div class="plan-grid">
-            <div class="day-card">
-                <h3>ימים 1 - 5: שכבה פיזית ואפנון</h3>
-                <p><strong>נושאים:</strong> ערוצי שידור, לולאה מקומית, PSTN, קידודים (NRZ, NRZI, Manchester, 4B/5B), דיאגרמות קונסטלציה ותקורה (Overhead).</p>
+            <div class="day-card" onclick="goToTopic('physical')">
+                <div>
+                    <h3>ימים 1-6: שכבה פיזית, קידודים ו-PSTN</h3>
+                    <p>PSTN (לולאה מקומית, מרכזיות), קידודי NRZ/NRZI, Manchester, 4B/5B, דיאגרמות קונסטלציה, חישובי רוחב פס וזמני שידור.</p>
+                </div>
+                <div class="btn-go">תרגל נושא זה (10+ שאלות) ←</div>
             </div>
-            <div class="day-card">
-                <h3>ימים 6 - 10: בקרת שגיאות ומסגור (Framing)</h3>
-                <p><strong>נושאים:</strong> Bit Stuffing, סיביות זוגיות מטריציוניות, קודי CRC ופולינומים יוצרים, חישובי תקורה באחוזים ותיקון שגיאות.</p>
+
+            <div class="day-card" onclick="goToTopic('datalink')">
+                <div>
+                    <h3>ימים 7-12: שכבת קו נתונים, CRC, CSMA/CD וחלון הזזה</h3>
+                    <p>מסגור (Bit Stuffing), זוגיות מטריציונית, קודי CRC ותקורה, CSMA/CD, CSMA-p, פרוטוקולי חלון הזזה (Additional ACKs, NAKs, RWS/SWS).</p>
+                </div>
+                <div class="btn-go">תרגל נושא זה (10+ שאלות) ←</div>
             </div>
-            <div class="day-card">
-                <h3>ימים 11 - 15: בקרת זרימה וערוצים משותפים</h3>
-                <p><strong>נושאים:</strong> פרוטוקולי חלון הזזה (Sliding Window), חלונות שליחה וקבלה, Additional ACKs, NAKs, CSMA/CD, CSMA-p ותורים.</p>
+
+            <div class="day-card" onclick="goToTopic('network')">
+                <div>
+                    <h3>ימים 13-18: שכבת הרשת, IP, סאבנטינג וניתוב</h3>
+                    <p>פרגמנטציה ב-IP (Offset/Ident), חישובי Subnetting וכתובות CIDR, טבלאות ניתוב (LPM, Default), וקטור מרחק (ספירה לאינסוף) ודייקסטרה (Link State).</p>
+                </div>
+                <div class="btn-go">תרגל נושא זה (10+ שאלות) ←</div>
             </div>
-            <div class="day-card">
-                <h3>ימים 16 - 20: שכבת הרשת וניתוב (Routing)</h3>
-                <p><strong>נושאים:</strong> אלגוריתם וקטורי מרחק (Distance Vector), ספירה לאינסוף, Link State, חישובי Subnetting מורכבים וטבלאות ניתוב (CIDR, Default).</p>
+
+            <div class="day-card" onclick="goToTopic('transport')">
+                <div>
+                    <h3>ימים 19-24: שכבת התובלה (TCP / UDP) ו-NAT</h3>
+                    <p>פורטים ב-UDP, לחיצת יד משולשת ב-TCP, דיאגרמת מצבים (ESTABLISHED, FIN_WAIT), ניהול Seq/Ack, Fast Retransmission, מתקפת SYN Flood וטבלאות NAT.</p>
+                </div>
+                <div class="btn-go">תרגל נושא זה (10+ שאלות) ←</div>
             </div>
-            <div class="day-card">
-                <h3>ימים 21 - 25: שכבת התובלה (TCP / UDP)</h3>
-                <p><strong>נושאים:</strong> לחיצת יד משולשת (3-way handshake), דיאגרמת מצבים של TCP (ESTABLISHED, FIN_WAIT), חישוב מספרי סידוריים ואישורים (Seq/Ack), Fast Retransmission ומתקפות SYN Flood.</p>
-            </div>
-            <div class="day-card">
-                <h3>ימים 26 - 28: שכבת היישום (DNS, SMTP)</h3>
-                <p><strong>נושאים:</strong> תהליכי איתור כתובות DNS וחישוב מספר סגמנטים, פרוטוקול SMTP ופקודות תוכנה, NAT.</p>
-            </div>
-            <div class="day-card">
-                <h3>ימים 29 - 30: סימולציות מבחן מלאות במצב אמת</h3>
-                <p><strong>מטרה:</strong> פתרון 3 מבחני גמר מלאים תחת עזרים מדודים וזמן קצוב, תיקון טעויות נפוצות והידוק פתרונות בשאלות הפתוחות.</p>
+
+            <div class="day-card" onclick="goToTopic('application_wireless')">
+                <div>
+                    <h3>ימים 25-30: שכבת היישום ורשתות אלחוטיות</h3>
+                    <p>תהליך איתור ב-DNS (רשומות A/CNAME, סגמנטים), פרוטוקול SMTP והעברת דואר, HTTP, רשתות אלחוטיות 802.11 (Active Scanning) ו-GSM (TDMA/FDMA).</p>
+                </div>
+                <div class="btn-go">תרגל נושא זה (10+ שאלות) ←</div>
             </div>
         </div>
     </div>
@@ -253,79 +296,420 @@
     <!-- Quiz Tab -->
     <div id="quiz" class="section-content">
         <div class="filter-bar">
-            <label for="topicFilter">סנן לפי נושא:</label>
+            <label for="topicFilter"><strong>סינון לפי נושא:</strong></label>
             <select id="topicFilter" onchange="filterQuestions()">
-                <option value="all">הכל (כל הנושאים)</option>
-                <option value="physical">שכבה פיזית וקידודים</option>
-                <option value="datalink">שכבת קו נתונים ובקרת שגיאות</option>
-                <option value="transport">שכבת התובלה (TCP/UDP)</option>
-                <option value="network">שכבת הרשת וניתוב</option>
+                <option value="all">כל השאלות (מאגר מלא)</option>
+                <option value="physical">שכבה פיזית, קידודים ו-PSTN</option>
+                <option value="datalink">שכבת קו נתונים, CRC, CSMA/CD וחלון הזזה</option>
+                <option value="network">שכבת הרשת, IP, סאבנטינג וניתוב</option>
+                <option value="transport">שכבת התובלה (TCP/UDP) ו-NAT</option>
+                <option value="application_wireless">שכבת היישום ורשתות אלחוטיות</option>
             </select>
         </div>
 
         <div id="questionsContainer">
-            <!-- Question 1: From OpenU 2026ג Exam (Q1) -->
+
+            <!-- ================= CATEGORY 1: PHYSICAL LAYER ================= -->
             <div class="question-box" data-topic="physical">
                 <div class="question-header">
-                    <span>שאלה מתוך מבחן גמר 2026ג (מועד א')</span>
-                    <span class="badge">שכבה פיזית</span>
+                    <span>מועד א' 2026ג - שאלה 1</span>
+                    <span class="badge">שכבה פיזית & PSTN</span>
                 </div>
-                <h3>1. התייחסו לשיחת טלפון המנוהלת בין שני אנשים ב-PSTN שבה הלולאה המקומית אנלוגית ומרכזיות הקצה לחיוב דיגיטליות. איזה מבין השיטות מאפשרת המרה לאות שניתן להעביר למרכזיית החיוב?</h3>
+                <h3>1. שיחת טלפון ב-PSTN שבה הלולאה המקומית אנלוגית והקווים בין מרכזיות הקצה לחיוב דיגיטליים. איזו שיטה מאפשרת המרת הקול האנושי במרכזיית הקצה לאות שיועבר למרכזיית החיוב?[cite: 56]</h3>
                 <ul class="options-list">
                     <li><label><input type="radio" name="q1" value="A"> א. FDM (Frequency Division Multiplexing)</label></li>
-                    <li><label><input type="radio" name="q1" value="B"> ב. דגימה של האות המייצג את הקול האנושי מספיק פעמים ביחידת זמן כדי להתקרב לייצוג האנלוגי</label></li>
+                    <li><label><input type="radio" name="q1" value="B"> ב. דגימה של האות המייצג את הקול האנושי מספיק פעמים ביחידת זמן כדי להתקרב לייצוג האנלוגי שלו</label></li>
                     <li><label><input type="radio" name="q1" value="C"> ג. אפנון אמפליטודה</label></li>
                     <li><label><input type="radio" name="q1" value="D"> ד. HDLC</label></li>
                 </ul>
-                <button class="btn" onclick="checkAnswer(1, 'B', 10, 'התשובה הנכונה היא ב. הקול האנושי נדגם בתדר מספיק פעמים כדי להמיר את האות האנלוגי לייצוג דיגיטלי תקני במרכזיית הקצה.')">בדוק תשובה</button>
+                <button class="btn" onclick="checkAnswer(1, 'B', 10, 'תשובה נכונה: ב. במרכזיית הקצה דוגמים את הקול האנושי (PCM) בתדר מספיק גבוה כדי להמיר את האות האנלוגי לייצוג דיגיטלי דיסקרטי[cite: 62].')">בדוק תשובה</button>
                 <div id="feedback1" class="feedback"></div>
             </div>
 
-            <!-- Question 2: From OpenU 2026ג Exam (Q2) -->
             <div class="question-box" data-topic="physical">
                 <div class="question-header">
-                    <span>שאלה מתוך מבחן גמר 2026ג (מועד א')</span>
-                    <span class="badge">שכבה פיזית</span>
+                    <span>מועד א' 2026ג - שאלה 2</span>
+                    <span class="badge">שכבה פיזית & קידודים</span>
                 </div>
-                <h3>2. סדרת הסיביות 010101010101 מיוצגת בקידוד NRZI. אורך מחזור שעון הוא $t$ מיקרו-שניות. מהו אורך הזמן המירבי במיקרו-שניות שבו תהיה רמת מתח קבועה?</h3>
+                <h3>2. סדרת הסיביות 010101010101 מיוצגת בקידוד NRZI[cite: 56]. אורך מחזור שעון הוא t מיקרו-שניות[cite: 56]. מהו אורך הזמן המירבי במיקרו-שניות שבו תהיה רמת מתח קבועה?[cite: 56]</h3>
                 <ul class="options-list">
-                    <li><label><input type="radio" name="q2" value="A"> א. 0.5</label></li>
-                    <li><label><input type="radio" name="q2" value="B"> ב. 1</label></li>
-                    <li><label><input type="radio" name="q2" value="C"> ג. 1.5</label></li>
-                    <li><label><input type="radio" name="q2" value="D"> ד. 2</label></li>
+                    <li><label><input type="radio" name="q2" value="A"> א. 0.5t</label></li>
+                    <li><label><input type="radio" name="q2" value="B"> ב. 1t</label></li>
+                    <li><label><input type="radio" name="q2" value="C"> ג. 1.5t</label></li>
+                    <li><label><input type="radio" name="q2" value="D"> ד. 2t</label></li>
                 </ul>
-                <button class="btn" onclick="checkAnswer(2, 'C', 10, 'התשובה היא 1.5. יש לנו $t/2$ של סיבית 1 לפני השינוי, עוד $t$ שלם של הסיבית 0, ועוד $t/2$ של הסיבית 1 הבאה, סך הכל 1.5t.')">בדוק תשובה</button>
+                <button class="btn" onclick="checkAnswer(2, 'C', 10, 'תשובה נכונה: ג. בקידוד NRZI, הסיבית 1 גורמת למעבר מתח באמצע מחזור, והסיבית 0 שומרת על המצב. הרצף יוצר זמן מירבי של 1.5t[cite: 62].')">בדוק תשובה</button>
                 <div id="feedback2" class="feedback"></div>
             </div>
 
-            <!-- Question 3: From OpenU 2026ג Exam (Q9 - TCP) -->
-            <div class="question-box" data-topic="transport">
+            <div class="question-box" data-topic="physical">
                 <div class="question-header">
-                    <span>שאלה מתוך מבחן גמר 2026ג (מועד א')</span>
-                    <span class="badge">שכבת התובלה</span>
+                    <span>מועד א'1 2026א - שאלה 1</span>
+                    <span class="badge">דיאגרמת קונסטלציה</span>
                 </div>
-                <h3>3. פרוטוקול TCP בין הוסט A ל-B. הלקוח A שולח 3 סגמנטים: (1) גודל M=1400, Seq=1800; (2) גודל S=250; (3) גודל L=600. אחרי שליחת הסגמנט השני ולפני השלישי, מתקבל אצל A אישור ACK עם המספר y. האם ניתן לדעת את y?</h3>
-                <textarea id="q3_text" rows="3" placeholder="הקלד את תשובתך והסברך המלא..."></textarea>
-                <button class="btn" onclick="checkOpenAnswer(3, 10, 'לא ניתן לדעת, משום שיתכן שהתקבל אישור רק לסגמנט הראשון (ואז y=3200) או לשני הסגמנטים יחד (ואז y=3450).')">הצג פתרון מלא</button>
+                <h3>3. בדיאגרמת קונסטלציה של מודם עם שני מעגלים ריכוזיים (4 נקודות במעגל פנימי ו-8 נקודות במעגל חיצוני[cite: 83]): בכמה פאזות משתמש המודם והאם מדובר באפנון פאזה בלבד?[cite: 76]</h3>
+                <ul class="options-list">
+                    <li><label><input type="radio" name="q3" value="A"> א. 8 פאזות; אפנון פאזה בלבד</label></li>
+                    <li><label><input type="radio" name="q3" value="B"> ב. 12 פאזות; שילוב של אפנון פאזה ואפנון אמפליטודה (QAM)</label></li>
+                    <li><label><input type="radio" name="q3" value="C"> ג. 16 פאזות; אפנון תדר ופאזה</label></li>
+                    <li><label><input type="radio" name="q3" value="D"> ד. 4 פאזות בלבד</label></li>
+                </ul>
+                <button class="btn" onclick="checkAnswer(3, 'B', 10, 'תשובה נכונה: ב. קיימות 12 פאזות שונות בשני המעגלים, ובגלל שיש שני רדיוסים (אמפליטודות) שונים, מדובר בשילוב של אפנון פאזה ואפנון אמפליטודה[cite: 83].')">בדוק תשובה</button>
                 <div id="feedback3" class="feedback"></div>
             </div>
 
-            <!-- Question 4: Additional practice on Subnetting -->
-            <div class="question-box" data-topic="network">
+            <div class="question-box" data-topic="physical">
                 <div class="question-header">
-                    <span>שאלת תרגרול מורחבת (רמת בחינה)</span>
-                    <span class="badge">שכבת הרשת</span>
+                    <span>מועד ב' 2026א - שאלה 1</span>
+                    <span class="badge">חישובי נפח וקצב</span>
                 </div>
-                <h3>4. נתון מרחב כתובות 182.168.75.0/24. עליך לחלק אותו לשתי רשתות נפרדות כך שתומכות ב-60 הוסטים כל אחת. מהו המסכה (Subnet Mask) הנדרשת עבור החלוקה?</h3>
+                <h3>4. תמונה בגודל 1920x1080 פיקסלים משודרת בערוץ של 60Mbps תוך 553 מילי-שניות[cite: 98]. כמה בתים (Bytes) משמשים לקידוד כל פיקסל (ללא תקורה)?[cite: 98]</h3>
                 <ul class="options-list">
-                    <li><label><input type="radio" name="q4" value="A"> א. /24</label></li>
-                    <li><label><input type="radio" name="q4" value="B"> ב. /25</label></li>
-                    <li><label><input type="radio" name="q4" value="C"> ג. /26</label></li>
-                    <li><label><input type="radio" name="q4" value="D"> ד. /27</label></li>
+                    <li><label><input type="radio" name="q4" value="A"> א. 1 בית (8 ביט)</label></li>
+                    <li><label><input type="radio" name="q4" value="B"> ב. 2 בתים (16 ביט)</label></li>
+                    <li><label><input type="radio" name="q4" value="C"> ג. 3 בתים (24 ביט)</label></li>
+                    <li><label><input type="radio" name="q4" value="D"> ד. 4 בתים (32 ביט)</label></li>
                 </ul>
-                <button class="btn" onclick="checkAnswer(4, 'C', 10, 'התשובה הנכונה היא ג (/26). כדי לתמוך ב-60 הוסטים נדרשים לפחות 6 ביטים להוסטים ($2^6 - 2 = 62$), כלומר 32 - 6 = 26 ביטים לרשת.')">בדוק תשובה</button>
+                <button class="btn" onclick="checkAnswer(4, 'B', 10, 'תשובה נכונה: ב. סך הסיביות = 60M * 0.553 = 33,180,000 ביט[cite: 95]. נחלק במספר הפיקסלים (2,073,600) ונקבל 16 ביט = 2 בתים לפיקסל[cite: 95].')">בדוק תשובה</button>
                 <div id="feedback4" class="feedback"></div>
             </div>
+
+            <div class="question-box" data-topic="physical">
+                <div class="question-header">
+                    <span>מועד ב' 2026א - שאלה 2</span>
+                    <span class="badge">קידוד 4B/5B ו-NRZI</span>
+                </div>
+                <h3>5. סדרה בת 16 סיביות מיועדת לשידור. (א) כמה סיביות ישודרו בקידוד 4B/5B? (ב) כיצד מעבר ל-4B/5B משפיע על פרק הזמן המירבי של מתח קבוע ב-NRZI?[cite: 98, 99]</h3>
+                <ul class="options-list">
+                    <li><label><input type="radio" name="q5" value="A"> א. 20 סיביות; פרק הזמן המירבי יגדל</label></li>
+                    <li><label><input type="radio" name="q5" value="B"> ב. 20 סיביות; פרק הזמן המירבי יקטן ויוגבל ל-4 מחזורי שעון</label></li>
+                    <li><label><input type="radio" name="q5" value="C"> ג. 16 סיביות; לא ישתנה</label></li>
+                    <li><label><input type="radio" name="q5" value="D"> ד. 24 סיביות; פרק הזמן יקטן</label></li>
+                </ul>
+                <button class="btn" onclick="checkAnswer(5, 'B', 10, 'תשובה נכונה: ב. בקידוד 4B/5B מתווספת סיבית לכל 4 סיביות (16 -> 20)[cite: 95]. המטרה ב-4B/5B היא למנוע רצף 0-ים ארוך ולכן היא מקטינה את זמן המתח הקבוע ב-NRZI[cite: 95].')">בדוק תשובה</button>
+                <div id="feedback5" class="feedback"></div>
+            </div>
+
+            <div class="question-box" data-topic="physical">
+                <div class="question-header">
+                    <span>שאלה מורחבת ברמת מבחן (מקורית)</span>
+                    <span class="badge">שכבה פיזית & PSTN</span>
+                </div>
+                <h3>6. במערכת PSTN, מהו התפקיד המרכזי של מרכזיית הקצה (End Office) בהשוואה לטרנק (Toll Connecting Trunk)?</h3>
+                <ul class="options-list">
+                    <li><label><input type="radio" name="q6" value="A"> א. מרכזיית הקצה מחברת ישירות בין שתי מדינות שונות</label></li>
+                    <li><label><input type="radio" name="q6" value="B"> ב. מרכזיית הקצה מאגדת את הקווים האנלוגיים של המנויים (Local Loop) וממירה אותם לקווים דיגיטליים המובילים למרכזיות החיוב</label></li>
+                    <li><label><input type="radio" name="q6" value="C"> ג. מרכזיית הקצה פועלת בשכבת האפליקציה בלבד</label></li>
+                    <li><label><input type="radio" name="q6" value="D"> ד. מרכזיית הקצה מבצעת הזרקת ניתוח אלגוריתמי בדיאגרמת קונסטלציה</label></li>
+                </ul>
+                <button class="btn" onclick="checkAnswer(6, 'B', 10, 'תשובה נכונה: ב. מרכזיית הקצה היא הנקודה בה מתחבר רכיב ה-Local Loop האנלוגי של בית המנוי ומבוצע התרגום לערוצים הדיגיטליים של רשת הליבה.')">בדוק תשובה</button>
+                <div id="feedback6" class="feedback"></div>
+            </div>
+
+            <!-- ================= CATEGORY 2: DATA LINK LAYER ================= -->
+            <div class="question-box" data-topic="datalink">
+                <div class="question-header">
+                    <span>מועד א' 2026ג - שאלה 3 (שאלה פתוחה)</span>
+                    <span class="badge open-q">בקרת שגיאות matrix parity</span>
+                </div>
+                <h3>7. מילת מידע מסודרת במטריצה בת (m-1) שורות ו-(n-1) עמודות עם סיביות זוגיות לכל שורה ועמודה[cite: 57]. (א) חלו שגיאות בדיוק ב-8 סיביות. (ב) חלו שגיאות בדיוק ב-6 סיביות. האם השגיאות יתגלו בכל תרחיש?[cite: 57]</h3>
+                <textarea id="q7_text" rows="3" placeholder="כתוב את הסברך המלא לתרחישים בהם השגיאות יתגלו או לא יתגלו..."></textarea>
+                <button class="btn" onclick="checkOpenAnswer(7, 10, 'פתרון מודל: בשני המקרים (גם ב-8 וגם ב-6 שגיאות) ייתכנו מקרים בהם השגיאות לא יתגלו[cite: 62]. אם השגיאות מסודרות בקודקודי מלבנים חופפים/שלמים (למשל מטריצה 2x3 של שגיאות), הזוגיות בכל השורות והעמודות שנפגעו תישמר זוגית והשגיאות לא יתגלו[cite: 62].')">הצג פתרון מלא</button>
+                <div id="feedback7" class="feedback"></div>
+            </div>
+
+            <div class="question-box" data-topic="datalink">
+                <div class="question-header">
+                    <span>מועד א' 2026ג - שאלה 4</span>
+                    <span class="badge">חלון הזזה</span>
+                </div>
+                <h3>8. פרוטוקול חלון הזזה עם RWS=1 ו-3 סיביות למספור[cite: 58]. מדיניות Additional ACKs[cite: 58]. נשלחות מסגרות 0-3 שמגיעות בהצלחה[cite: 58]. מתוך 4 האישורים שנשלחו, רק אישור אחד מגיע ל-A[cite: 58]. מה המספר הגבוה ביותר שיהיה בראש חלון השליחה?[cite: 58]</h3>
+                <ul class="options-list">
+                    <li><label><input type="radio" name="q8" value="A"> א. 1</label></li>
+                    <li><label><input type="radio" name="q8" value="B"> ב. 2</label></li>
+                    <li><label><input type="radio" name="q8" value="C"> ג. 4</label></li>
+                    <li><label><input type="radio" name="q8" value="D"> ד. 0</label></li>
+                </ul>
+                <button class="btn" onclick="checkAnswer(8, 'C', 10, 'תשובה נכונה: ג. המספר המירבי בראש החלון הוא 4[cite: 62]. זה יקרה אם האישור היחיד שהגיע ל-A הוא האישור עבור מסגרת 3, שכן אישור מצטבר זה מאשר במשתמע גם את 0, 1 ו-2[cite: 62].')">בדוק תשובה</button>
+                <div id="feedback8" class="feedback"></div>
+            </div>
+
+            <div class="question-box" data-topic="datalink">
+                <div class="question-header">
+                    <span>מועד א' 2026ג - שאלה 5</span>
+                    <span class="badge">CSMA/CD</span>
+                </div>
+                <h3>9. רשת CSMA/CD באורך 0.5 ק"מ, מהירות התפשטות 200,000 ק"מ/שנייה[cite: 58]. (א) מהו זמן ההתפשטות (tau)? (ב) אם קצב השידור הוא 6Gbps, מהו אורך המסגרת המינימלי?[cite: 59]</h3>
+                <ul class="options-list">
+                    <li><label><input type="radio" name="q9" value="A"> א. tau = 2.5 microsec; אורך מינימלי = 30,001 סיביות</label></li>
+                    <li><label><input type="radio" name="q9" value="B"> ב. tau = 5 microsec; אורך מינימלי = 15,000 סיביות</label></li>
+                    <li><label><input type="radio" name="q9" value="C"> ג. tau = 2.5 microsec; אורך מינימלי = 60,000 סיביות</label></li>
+                    <li><label><input type="radio" name="q9" value="D"> ד. tau = 1 microsec; אורך מינימלי = 10,000 סיביות</label></li>
+                </ul>
+                <button class="btn" onclick="checkAnswer(9, 'A', 10, 'תשובה נכונה: א. tau = 0.5/200,000 = 2.5 מיקרו-שניות[cite: 63]. כדי לגבש CSMA/CD נדרש זמן שידור T > 2*tau[cite: 63]. לכן m > 2 * 2.5us * 6Gbps = 30,000 bits -> 30,001 סיביות[cite: 63].')">בדוק תשובה</button>
+                <div id="feedback9" class="feedback"></div>
+            </div>
+
+            <div class="question-box" data-topic="datalink">
+                <div class="question-header">
+                    <span>מועד א'1 2026א - שאלה 2</span>
+                    <span class="badge">HDLC & Bit Stuffing</span>
+                </div>
+                <h3>10. בתחנה השולחת מסגרת מידע בת 200 סיביות שכולן '0' ב-HDLC עם Bit Stuffing ודגל 11110[cite: 86]. מהו מספר הסיביות במסגרת המשודרת כולל דגלי פתיחה וסיום?[cite: 86]</h3>
+                <ul class="options-list">
+                    <li><label><input type="radio" name="q10" value="A"> א. 200 סיביות</label></li>
+                    <li><label><input type="radio" name="q10" value="B"> ב. 210 סיביות</label></li>
+                    <li><label><input type="radio" name="q10" value="C"> ג. 216 סיביות</label></li>
+                    <li><label><input type="radio" name="q10" value="D"> ד. 240 סיביות</label></li>
+                </ul>
+                <button class="btn" onclick="checkAnswer(10, 'C', 10, 'תשובה נכונה: ג. מכיוון שכל 200 הסיביות הן 0, לא נוספות סיביות stuffing בתוך גוף המידע[cite: 94]. מוסיפים רק את דגל ההתחלה והסיום שיוצרים יחד 216 סיביות[cite: 94].')">בדוק תשובה</button>
+                <div id="feedback10" class="feedback"></div>
+            </div>
+
+            <div class="question-box" data-topic="datalink">
+                <div class="question-header">
+                    <span>מועד א'1 2026א - שאלה 3</span>
+                    <span class="badge">קודי CRC ותקורה</span>
+                </div>
+                <h3>11. מילות מידע בנות m סיביות מקודדות בקוד CRC עם פולינום יוצר ממעלה 12[cite: 77]. נתון שהתקורה היא 2%[cite: 77]. מהו ערכו של m?[cite: 77]</h3>
+                <ul class="options-list">
+                    <li><label><input type="radio" name="q11" value="A"> א. m = 588</label></li>
+                    <li><label><input type="radio" name="q11" value="B"> ב. m = 600</label></li>
+                    <li><label><input type="radio" name="q11" value="C"> ג. m = 120</label></li>
+                    <li><label><input type="radio" name="q11" value="D"> ד. m = 500</label></li>
+                </ul>
+                <button class="btn" onclick="checkAnswer(11, 'A', 10, 'תשובה נכונה: א. פולינום ממעלה 12 מוסיף 12 סיביות בדיקה[cite: 83]. התקורה באחוזים היא 12/(12+m) = 0.02[cite: 83]. מפתרון המשוואה מתקבל m = 588[cite: 83].')">בדוק תשובה</button>
+                <div id="feedback11" class="feedback"></div>
+            </div>
+
+            <div class="question-box" data-topic="datalink">
+                <div class="question-header">
+                    <span>מועד א'1 2026א - שאלה 4</span>
+                    <span class="badge">CSMA-p vs CSMA-1</span>
+                </div>
+                <h3>12. ברשת עם k תחנות, הערוץ פנוי ולכולן מסגרת מוכנה. (א) ב-CSMA-p מהי ההסתברות לשידור מוצלח? (ב) ב-CSMA-1 מהי ההסתברות לשידור מוצלח?[cite: 77]</h3>
+                <ul class="options-list">
+                    <li><label><input type="radio" name="q12" value="A"> א. (א) k*p*(1-p)^(k-1) ; (ב) 0</label></li>
+                    <li><label><input type="radio" name="q12" value="B"> ב. (א) p ; (ב) 1</label></li>
+                    <li><label><input type="radio" name="q12" value="C"> ג. (א) 1-p ; (ב) p</label></li>
+                    <li><label><input type="radio" name="q12" value="D"> ד. (א) 0 ; (ב) 0</label></li>
+                </ul>
+                <button class="btn" onclick="checkAnswer(12, 'A', 10, 'תשובה נכונה: א. ב-CSMA-p השידור מוצלח רק אם בדיוק תחנה אחת משדרת בהסתברות p והיתר לא[cite: 83]. ב-CSMA-1 כולן משדרות בו-זמנית ולכן בוודאות תהיה התנגשות (הסתברות 0)[cite: 83].')">בדוק תשובה</button>
+                <div id="feedback12" class="feedback"></div>
+            </div>
+
+            <!-- ================= CATEGORY 3: NETWORK LAYER ================= -->
+            <div class="question-box" data-topic="network">
+                <div class="question-header">
+                    <span>מועד א' 2026ג - שאלה 6</span>
+                    <span class="badge">CIDR & LPM Routing</span>
+                </div>
+                <h3>13. בטבלת ניתוב נתונים הטווחים: 182.168.250.0/24 (קו A), 182.168.80.0/24 (קו A), 182.168.0.0/17 (קו B), 182.168.63.0/24 (קו C), 182.168.64.0/18 (קו C), 182.168.96.0/19 (קו D), Default (קו E)[cite: 59]. כמה כתובות המתחילות ב-182.168 ינותבו דרך E?[cite: 59]</h3>
+                <ul class="options-list">
+                    <li><label><input type="radio" name="q13" value="A"> א. 32,512 כתובות</label></li>
+                    <li><label><input type="radio" name="q13" value="B"> ב. 0 כתובות</label></li>
+                    <li><label><input type="radio" name="q13" value="C"> ג. 65,536 כתובות</label></li>
+                    <li><label><input type="radio" name="q13" value="D"> ד. 16,384 כתובות</label></li>
+                </ul>
+                <button class="btn" onclick="checkAnswer(13, 'A', 10, 'תשובה נכונה: א. סך הכתובות ב-182.168 הוא 65,536[cite: 63]. B מכסה את המחצית הראשונה (32,768) פרט לשורה הראשונה ב-A שתתפוס 256. החישוב מעניק 32,512 כתובות שינותבו ל-E[cite: 63].')">בדוק תשובה</button>
+                <div id="feedback13" class="feedback"></div>
+            </div>
+
+            <div class="question-box" data-topic="network">
+                <div class="question-header">
+                    <span>מועד א'1 2026א - שאלה 5</span>
+                    <span class="badge">Distance Vector Routing</span>
+                </div>
+                <h3>14. ברשת בטופולוגיית כוכב המנוהלת באלגוריתם Distance Vector, התנתק קו תקשורת אחד. האם בעיית הספירה לאינסוף עלולה להתרחש?[cite: 78]</h3>
+                <ul class="options-list">
+                    <li><label><input type="radio" name="q14" value="A"> א. כן, בעיית הספירה לאינסוף בהכרח תתרחש</label></li>
+                    <li><label><input type="radio" name="q14" value="B"> ב. כן, בעיית הספירה לאינסוף עלולה להתרחש, אך לא בהכרח תתרחש (תלוי בתזמון הוקטורים)</label></li>
+                    <li><label><input type="radio" name="q14" value="C"> ג. לא, בעיית הספירה לאינסוף לא תתרחש בטופולוגיית כוכב בשום מקרה</label></li>
+                    <li><label><input type="radio" name="q14" value="D"> ד. לא, מפני שגרף כוכב מכיל מעגלים בלבד</label></li>
+                </ul>
+                <button class="btn" onclick="checkAnswer(14, 'B', 10, 'תשובה נכונה: ב. הבעיה עלולה להתרחש אם צומת שכן יחשוב שיש מסלול חלופי דרך השכן שלו[cite: 83], אך התרחשותה תלויה בתזמון הגעת הודעות העדכון[cite: 83].')">בדוק תשובה</button>
+                <div id="feedback14" class="feedback"></div>
+            </div>
+
+            <div class="question-box" data-topic="network">
+                <div class="question-header">
+                    <span>מועד א'1 2026א - שאלה 6</span>
+                    <span class="badge">IP Fragmentation</span>
+                </div>
+                <h3>15. פקטת IP עברה פרגמנטציה לשתי פקטות: לראשונה Offset=0, ולשנייה Offset=64 וגודל הנתונים בה הוא 234 בתים[cite: 88]. (א) כמה בתים נתונים היו בפקטה הראשונה (m)? (ב) כמה בתים נתונים היו בפקטה המקורית (n)?[cite: 88]</h3>
+                <ul class="options-list">
+                    <li><label><input type="radio" name="q15" value="A"> א. m = 512 ; n = 746</label></li>
+                    <li><label><input type="radio" name="q15" value="B"> ב. m = 64 ; n = 298</label></li>
+                    <li><label><input type="radio" name="q15" value="C"> ג. m = 256 ; n = 490</label></li>
+                    <li><label><input type="radio" name="q15" value="D"> ד. m = 1024 ; n = 1258</label></li>
+                </ul>
+                <button class="btn" onclick="checkAnswer(15, 'A', 10, 'תשובה נכונה: א. ה-Offset נמדד ביחידות של 8 בתים. לכן m = 64 * 8 = 512 בתים[cite: 94]. סך הכל בפקטה המקורית: n = 512 + 234 = 746 בתים[cite: 94].')">בדוק תשובה</button>
+                <div id="feedback15" class="feedback"></div>
+            </div>
+
+            <div class="question-box" data-topic="network">
+                <div class="question-header">
+                    <span>מועד ב' 2026א - שאלה 4</span>
+                    <span class="badge">מעגלים מדומים (Virtual Circuits)</span>
+                </div>
+                <h3>16. ברשת מעגל מדומה דרך 3 מתגים: Switch 1 (Port 1, VCI 14 -> Port 3, VCI X), Switch 2 (Port 1, VCI 66 -> Port 2, VCI 22), Switch 3 (Port 2, VCI Y -> Port 3, VCI 77)[cite: 99]. מהם הערכים של X ו-Y?[cite: 99]</h3>
+                <ul class="options-list">
+                    <li><label><input type="radio" name="q16" value="A"> א. X = 66 ; Y = 22</label></li>
+                    <li><label><input type="radio" name="q16" value="B"> ב. X = 14 ; Y = 77</label></li>
+                    <li><label><input type="radio" name="q16" value="C"> ג. X = 22 ; Y = 66</label></li>
+                    <li><label><input type="radio" name="q16" value="D"> ד. לא ניתן לדעת</label></li>
+                </ul>
+                <button class="btn" onclick="checkAnswer(16, 'A', 10, 'תשובה נכונה: א. ה-VCI במוצא של Switch 1 מתחבר לכניסה של Switch 2 ולכן X = 66[cite: 95]. ה-VCI במוצא של Switch 2 מתחבר לכניסה של Switch 3 ולכן Y = 22[cite: 95].')">בדוק תשובה</button>
+                <div id="feedback16" class="feedback"></div>
+            </div>
+
+            <div class="question-box" data-topic="network">
+                <div class="question-header">
+                    <span>מועד ב' 2026א - שאלה 5</span>
+                    <span class="badge">אלגוריתם דייקסטרה</span>
+                </div>
+                <h3>17. בהרצת אלגוריתם דייקסטרה למציאת מסלולים קצרים ביותר, האם כל צומת שהופך להיות "פעיל" במהלך הרצת האלגוריתם בהכרח יהיה חלק מהמסלול הקצר ביותר שנמצא בסוף?[cite: 100]</h3>
+                <ul class="options-list">
+                    <li><label><input type="radio" name="q17" value="A"> א. כן, בהכרח</label></li>
+                    <li><label><input type="radio" name="q17" value="B"> ב. לא. צומת שהופך לפעיל לא בהכרח יהיה חלק מהמסלול הקצר ביותר שנבחר עבור יעד מסוים</label></li>
+                    <li><label><input type="radio" name="q17" value="C"> ג. דייקסטרה לא מנהל צמתים פעילים</label></li>
+                    <li><label><input type="radio" name="q17" value="D"> ד. תלוי רק אם הגרף מכיל משקלים שליליים</label></li>
+                </ul>
+                <button class="btn" onclick="checkAnswer(17, 'B', 10, 'תשובה נכונה: ב. צומת פעיל נבחן במהלך האלגוריתם בשל המרחק הקצר אליו, אך לא כל צומת פעיל ישמש כצומת מעבר במסלול הסופי ליעד ספציפי[cite: 95].')">בדוק תשובה</button>
+                <div id="feedback17" class="feedback"></div>
+            </div>
+
+            <!-- ================= CATEGORY 4: TRANSPORT LAYER ================= -->
+            <div class="question-box" data-topic="transport">
+                <div class="question-header">
+                    <span>מועד א' 2026ג - שאלות 9-10 (שאלה פתוחה)</span>
+                    <span class="badge open-q">TCP Sequence & Ack Numbers</span>
+                </div>
+                <h3>18. לקוח A שולח לשרת B 3 סגמנטים ב-TCP: (1) M=1400, Seq=1800; (2) S=250; (3) L=600[cite: 60]. (א) אחרי הסגמנט השני מתקבל ACK y. מהו y? (ב) אחרי הסגמנט השלישי מתקבל ACK z וכל החוצצים מתפנים. מהו z?[cite: 60, 61]</h3>
+                <textarea id="q18_text" rows="3" placeholder="הסבר את הערכים של y ו-z..."></textarea>
+                <button class="btn" onclick="checkOpenAnswer(18, 10, 'פתרון מודל: (א) לא ניתן לדעת את y (כותבים 1-), כי ACK יכול לאשר רק את הראשונה (y=3200) או את שתיהן (y=3450)[cite: 64]. (ב) z ניתן לדעת והוא z = 1800 + 1400 + 250 + 600 = 4050, מפני שכל החוצצים התפנו[cite: 64]!')">הצג פתרון מלא</button>
+                <div id="feedback18" class="feedback"></div>
+            </div>
+
+            <div class="question-box" data-topic="transport">
+                <div class="question-header">
+                    <span>מועד א' 2026ג - שאלה 7 (שאלה פתוחה)</span>
+                    <span class="badge open-q">דיאגרמת מצבים של TCP</span>
+                </div>
+                <h3>19. תאר את התהליך שהוביל הוסט A מהמצב ESTABLISHED אל המצב FIN_WAIT_2 בדיאגרמת המצבים של TCP, כולל מצבי הדגלים[cite: 71].</h3>
+                <textarea id="q19_text" rows="3" placeholder="רשום את סדר הסגמנטים והדגלים..."></textarea>
+                <button class="btn" onclick="checkOpenAnswer(19, 10, 'פתרון מודל: 1. A שולח סגמנט עם דגל FIN דולק (בקשת סגירה) ועובר למצב FIN_WAIT_1[cite: 71, 107]. 2. B שולח סגמנט אישור עם דגל ACK דולק (ללא FIN)[cite: 107]. עם קבלת האישור A עובר למצב FIN_WAIT_2 (ממתין ל-FIN מ-B)[cite: 71, 107].')">הצג פתרון מלא</button>
+                <div id="feedback19" class="feedback"></div>
+            </div>
+
+            <div class="question-box" data-topic="transport">
+                <div class="question-header">
+                    <span>מועד א' 2026ג - שאלה 10</span>
+                    <span class="badge">מתקפת SYN Flood</span>
+                </div>
+                <h3>20. בשרת התקבלו סגמנטים רבים מהוסטים שונים עם דגל SYN דולק, השרת השיב בסגמנטים עם דגלים SYN+ACK, אך מהלקוחות לא התקבל סגמנט נוסף[cite: 74]. איזו מתקפה זו?[cite: 74]</h3>
+                <ul class="options-list">
+                    <li><label><input type="radio" name="q20" value="A"> א. מתקפת TCP SYN Flood</label></li>
+                    <li><label><input type="radio" name="q20" value="B"> ב. מתקפת DNS Poisoning</label></li>
+                    <li><label><input type="radio" name="q20" value="C"> ג. מתקפת Man-in-the-Middle</label></li>
+                    <li><label><input type="radio" name="q20" value="D"> ד. מתקפת Buffer Overflow בשכבת הפיזית</label></li>
+                </ul>
+                <button class="btn" onclick="checkAnswer(20, 'A', 10, 'תשובה נכונה: א. מדובר במתקפת SYN Flood שבה התוקף מציף את השרת בבקשות הקמת קשר (SYN) ולא משלים את השלב השלישי (ACK), מנצל חוצצים ומביא למניעת שירות[cite: 107].')">בדוק תשובה</button>
+                <div id="feedback20" class="feedback"></div>
+            </div>
+
+            <div class="question-box" data-topic="transport">
+                <div class="question-header">
+                    <span>מועד א'1 2026א - שאלה 6</span>
+                    <span class="badge">פורטים ב-UDP</span>
+                </div>
+                <h3>21. לקוח A שולח סגמנט UDP X לשרת B. בתגובה B שולח סגמנט Y[cite: 78]. קבע לגבי הגיגדים: (1) Destination Port ב-X תמיד זהה ל-Source Port ב-Y[cite: 78]. (2) Destination Port ב-X תמיד זהה ל-Destination Port ב-Y[cite: 78].</h3>
+                <ul class="options-list">
+                    <li><label><input type="radio" name="q21" value="A"> א. (1) נכון ; (2) לא נכון</label></li>
+                    <li><label><input type="radio" name="q21" value="B"> ב. (1) לא נכון ; (2) נכון</label></li>
+                    <li><label><input type="radio" name="q21" value="C"> ג. שניהם נכונים</label></li>
+                    <li><label><input type="radio" name="q21" value="D"> ד. שניהם לא נכונים</label></li>
+                </ul>
+                <button class="btn" onclick="checkAnswer(21, 'A', 10, 'תשובה נכונה: א. היעד של סגמנט X הוא הפורט של השרת, ולכן בסגמנט Y התגובה תצא מפורט זה כמקור (Source Port)[cite: 83]. היעד של Y יהיה הפורט האקראי של הלקוח[cite: 83].')">בדוק תשובה</button>
+                <div id="feedback21" class="feedback"></div>
+            </div>
+
+            <div class="question-box" data-topic="transport">
+                <div class="question-header">
+                    <span>מועד ב' 2026א - שאלה 8 (שאלה פתוחה)</span>
+                    <span class="badge open-q">Network Address Translation (NAT)</span>
+                </div>
+                <h3>22. הוסט 10.0.0.3 מתוך LAN שולח סגמנט מפורט 5466 אל 128.119.40.186:80 דרך נתב NAT שכתובתו החיצונית 188.36.25.65[cite: 103]. מהם ערכי S (כתובת/פורט מקור) ו-D (כתובת/פורט יעד) ביציאה מ-NAT[cite: 103]?</h3>
+                <textarea id="q22_text" rows="3" placeholder="פרט את W, X, Y, Z..."></textarea>
+                <button class="btn" onclick="checkOpenAnswer(22, 10, 'פתרון מודל: כתובת המקור במוצא W = 188.36.25.65 (כתובת ה-NAT החיצונית)[cite: 96]. פורט המקור X מוקצה דינמית בטבלת ה-NAT (לא ניתן לדעת במדוייק)[cite: 96]. כתובת היעד Y = 128.119.40.186 ופורט היעד Z = 80 נשארים ללא שינוי[cite: 96].')">הצג פתרון מלא</button>
+                <div id="feedback22" class="feedback"></div>
+            </div>
+
+            <!-- ================= CATEGORY 5: APPLICATION & WIRELESS ================= -->
+            <div class="question-box" data-topic="application_wireless">
+                <div class="question-header">
+                    <span>מועד א' 2026ג - שאלה 7</span>
+                    <span class="badge">DNS Resolution</span>
+                </div>
+                <h3>23. משתמש מקליד ftp.example.com[cite: 59]. (א) כמה סגמנטים יישלחו בתהליך איתור ה-IP מול שרת מקומי שאין לו את הרשומה ב-Cache? (ב) כמה סגמנטים יישלחו אם קיימת רשומת CNAME מפנה בשרת המקומי[cite: 59]?</h3>
+                <ul class="options-list">
+                    <li><label><input type="radio" name="q23" value="A"> א. (א) 8 סגמנטים ; (ב) 2 סגמנטים</label></li>
+                    <li><label><input type="radio" name="q23" value="B"> ב. (א) 4 סגמנטים ; (ב) 4 סגמנטים</label></li>
+                    <li><label><input type="radio" name="q23" value="C"> ג. (א) 2 סגמנטים ; (ב) 8 סגמנטים</label></li>
+                    <li><label><input type="radio" name="q23" value="D"> ד. (א) 6 סגמנטים ; (ב) 1 סגמנט</label></li>
+                </ul>
+                <button class="btn" onclick="checkAnswer(23, 'A', 10, 'תשובה נכונה: א. ללא Cache: בקשה+תגובה מול Root, TLD, Authoritative והשרת המקומי = 8 סגמנטים[cite: 63, 64]. עם רשומת CNAME מקומית ישירות למחשב: 2 סגמנטים בלבד[cite: 64].')">בדוק תשובה</button>
+                <div id="feedback23" class="feedback"></div>
+            </div>
+
+            <div class="question-box" data-topic="application_wireless">
+                <div class="question-header">
+                    <span>מועד א' 2026ג - שאלה 8</span>
+                    <span class="badge">רשתות סלולריות GSM</span>
+                </div>
+                <h3>24. ברשת טלפוניה סלולרית העושה שימוש בטכנולוגיית GSM, באיזו שיטה/ות נעשית חלוקת התדרים והמשאבים למשתמשים?[cite: 60]</h3>
+                <ul class="options-list">
+                    <li><label><input type="radio" name="q24" value="A"> א. TDMA בלבד</label></li>
+                    <li><label><input type="radio" name="q24" value="B"> ב. FDMA בלבד</label></li>
+                    <li><label><input type="radio" name="q24" value="C"> ג. CDMA בלבד</label></li>
+                    <li><label><input type="radio" name="q24" value="D"> ד. שילוב של TDMA ו-FDMA</label></li>
+                </ul>
+                <button class="btn" onclick="checkAnswer(24, 'D', 10, 'תשובה נכונה: ד. מערכת GSM היא מערכת דור 2 דיגיטלית העושה שימוש בשילוב של FDMA (חלוקה לתדרי משנה) ו-TDMA (חלוקת כל תדר לחריצי זמן)[cite: 64].')">בדוק תשובה</button>
+                <div id="feedback24" class="feedback"></div>
+            </div>
+
+            <div class="question-box" data-topic="application_wireless">
+                <div class="question-header">
+                    <span>מועד א'1 2026א - שאלה 7</span>
+                    <span class="badge">פרוטוקול SMTP</span>
+                </div>
+                <h3>25. בהעברת דואר אלקטרוני מאליס לבוב, בעת המעבר בין שרת הדואר של אליס לשרת הדואר של בוב[cite: 79]: איזה צד מריץ כל אחד מהשרתים בתוכנת SMTP?[cite: 79]</h3>
+                <ul class="options-list">
+                    <li><label><input type="radio" name="q25" value="A"> א. שרת אליס מריץ צד שרת, שרת בוב מריץ צד שרת</label></li>
+                    <li><label><input type="radio" name="q25" value="B"> ב. שרת אליס מריץ צד לקוח, שרת בוב מריץ צד שרת</label></li>
+                    <li><label><input type="radio" name="q25" value="C"> ג. שרת אליס מריץ צד שרת, שרת בוב מריץ צד לקוח</label></li>
+                    <li><label><input type="radio" name="q25" value="D"> ד. שניהם מריצים צד לקוח בלבד</label></li>
+                </ul>
+                <button class="btn" onclick="checkAnswer(25, 'B', 10, 'תשובה נכונה: ב. השרת של אליס יוזם את הפנייה ולכן פועל כ-SMTP Client, בעוד שרת הדואר של בוב מקבל את הפנייה ופועל כ-SMTP Server[cite: 83].')">בדוק תשובה</button>
+                <div id="feedback25" class="feedback"></div>
+            </div>
+
+            <div class="question-box" data-topic="application_wireless">
+                <div class="question-header">
+                    <span>מועד א' 2026ג - שאלה 9</span>
+                    <span class="badge">רשתות אלחוטיות 802.11</span>
+                </div>
+                <h3>26. מחשב H1 מתחבר ברשת אלחוטית ב-Active Scanning עם Probe Request[cite: 73]. הוא נמצא בטווח 2 נקודות גישה (AP1, AP2)[cite: 73]. (א) כמה מסגרות ישדר H1? (ב) כמה מסגרות ישדרו שני ה-AP יחד?[cite: 73]</h3>
+                <ul class="options-list">
+                    <li><label><input type="radio" name="q26" value="A"> א. (א) 2 מסגרות ; (ב) 3 מסגרות</label></li>
+                    <li><label><input type="radio" name="q26" value="B"> ב. (א) 1 מסגרת ; (ב) 2 מסגרות</label></li>
+                    <li><label><input type="radio" name="q26" value="C"> ג. (א) 3 מסגרות ; (ב) 4 מסגרות</label></li>
+                    <li><label><input type="radio" name="q26" value="D"> ד. (א) 5 מסגרות ; (ב) 1 מסגרת</label></li>
+                </ul>
+                <button class="btn" onclick="checkAnswer(26, 'A', 10, 'תשובה נכונה: א. המחשב H1 משדר Probe Request ואחר כך Association Request (סך הכל 2 מסגרות)[cite: 107]. שני ה-AP משיבים ב-Probe Response, ו-AP שנקשר משיב ב-Association Response (סך הכל 3 מסגרות)[cite: 107].')">בדוק תשובה</button>
+                <div id="feedback26" class="feedback"></div>
+            </div>
+
         </div>
     </div>
 
@@ -334,20 +718,20 @@
         <div class="stats-dashboard">
             <div class="stat-card">
                 <h3 id="scoreDisplay">0</h3>
-                <p>ציון מצטבר נוכחי</p>
+                <p>ציון מצטבר</p>
             </div>
             <div class="stat-card">
-                <h3 id="solvedCount">0 / 4</h3>
-                <p>שאלות שענית עליהן</p>
+                <h3 id="solvedCount">0 / 26</h3>
+                <p>שאלות שפתרת</p>
             </div>
             <div class="stat-card">
                 <h3>100</h3>
-                <p>היעד שלך למבחן</p>
+                <p>ציון היעד במבחן</p>
             </div>
         </div>
         <div class="card">
-            <h2>ניתוח ביצועים</h2>
-            <p id="statsMessage">התחל לפתור שאלות בלשונית "מאגר שאלות" כדי לקבל ניתוח מפורט של רמת השליטה שלך בכל נושא.</p>
+            <h2>ניתוח התקדמות בלמידה</h2>
+            <p id="statsMessage">פתור שאלות בלשונית התרגול כדי להתקדם ולראות את אחוזי המוכנות שלך למבחן!</p>
         </div>
     </div>
 </div>
@@ -355,12 +739,22 @@
 <script>
     let userScore = 0;
     let solvedQuestions = new Set();
+    const totalQuestionsInPool = 26;
 
     function switchTab(tabId) {
         document.querySelectorAll('.section-content').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        
         document.getElementById(tabId).classList.add('active');
-        event.currentTarget.classList.add('active');
+        document.getElementById(`tab-${tabId}-btn`).classList.add('active');
+    }
+
+    function goToTopic(topicCategory) {
+        switchTab('quiz');
+        const filterSelect = document.getElementById('topicFilter');
+        filterSelect.value = topicCategory;
+        filterQuestions();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function checkAnswer(qNum, correctOpt, points, explanation) {
@@ -384,7 +778,7 @@
             }
         } else {
             fb.className = 'feedback incorrect';
-            fb.innerHTML = `<strong>תשובה שגורה.</strong><br>${explanation}`;
+            fb.innerHTML = `<strong>תשובה שגויה.</strong><br>${explanation}`;
         }
     }
 
@@ -392,7 +786,7 @@
         const fb = document.getElementById(`feedback${qNum}`);
         fb.style.display = 'block';
         fb.className = 'feedback correct';
-        fb.innerHTML = `<strong>הסבר ופתרון מודל:</strong><br>${explanation}`;
+        fb.innerHTML = `<strong>תשובה ומדריך מודל מלא:</strong><br>${explanation}`;
         if (!solvedQuestions.has(qNum)) {
             solvedQuestions.add(qNum);
             userScore += points;
@@ -402,10 +796,9 @@
 
     function updateStats() {
         document.getElementById('scoreDisplay').innerText = userScore;
-        document.getElementById('solvedCount').innerText = `${solvedQuestions.size} / 4`;
-        if (solvedQuestions.size >= 3) {
-            document.getElementById('statsMessage').innerText = 'התרשמות מעולה! אתה נמצא במסלול הבטוח לציון 100 במבחן.';
-        }
+        document.getElementById('solvedCount').innerText = `${solvedQuestions.size} / ${totalQuestionsInPool}`;
+        const pct = Math.round((solvedQuestions.size / totalQuestionsInPool) * 100);
+        document.getElementById('statsMessage').innerText = `ענית בהצלחה על ${pct}% ממאגר השאלות! המשך כך כדי להבטיח ציון 100 במבחן.`;
     }
 
     function filterQuestions() {
