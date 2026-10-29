@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מערכת הכנה מתקדמת - רשתות תקשורת מחשבים (20948)</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #3b82f6;
+            --accent: #10b981;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --border: #e2e8f0;
+        }
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        header h1 { margin: 0 0 0.5rem 0; font-size: 2.2rem; }
+        header p { margin: 0; opacity: 0.9; font-size: 1.1rem; }
+        
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+            overflow-x: auto;
+        }
+        .tab-btn {
+            background: white;
+            border: 1px solid var(--border);
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text);
+            white-space: nowrap;
+        }
+        .tab-btn.active, .tab-btn:hover {
+            background: var(--secondary);
+            color: white;
+            border-color: var(--secondary);
+        }
+
+        .section-content { display: none; }
+        .section-content.active { display: block; }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* Study Plan Styles */
+        .plan-grid {
+            display: grid;
+            gap: 1rem;
+        }
+        .day-card {
+            border-right: 5px solid var(--secondary);
+            background: white;
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .day-card h3 { margin-top: 0; color: var(--primary); }
+
+        /* Quiz Styles */
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 1.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .filter-bar select {
+            padding: 0.5rem;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            font-size: 1rem;
+        }
+        
+        .question-box {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+        .badge {
+            background: #e0f2fe;
+            color: #0369a1;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-weight: 600;
+        }
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0;
+        }
+        .options-list li {
+            margin-bottom: 0.5rem;
+        }
+        .options-list label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.75rem;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .options-list label:hover { background: #f1f5f9; }
+        
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-top: 0.5rem;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+        
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 1rem;
+        }
+        .btn:hover { background: #1d4ed8; }
+
+        .feedback {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            display: none;
+        }
+        .feedback.correct { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+        .feedback.incorrect { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+
+        .stats-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+        .stat-card h3 { margin: 0; font-size: 2rem; color: var(--primary); }
+        .stat-card p { margin: 0.5rem 0 0 0; color: #64748b; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>רשתות תקשורת מחשבים (20948)</h1>
+    <p>מערכת אימון מקיפה לרמת 100 – מוכנות מוחלטת למבחן</p>
+</header>
+
+<div class="container">
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('plan')">תוכנית לימודים (30 יום)</button>
+        <button class="tab-btn" onclick="switchTab('quiz')">מאגר שאלות ותרגול</button>
+        <button class="tab-btn" onclick="switchTab('stats')">מעקב ציונים והתקדמות</button>
+    </div>
+
+    <!-- Study Plan Tab -->
+    <div id="plan" class="section-content active">
+        <div class="card">
+            <h2>תוכנית עבודה ממוקדת לציון 100 ב-30 יום</h2>
+            <p>התוכנית בנויה כך שתעבור באופן שיטתי על כל נושאי הלימוד, תפתור מבחני עבר, ותסגור פינות עד לרמת שליטה מוחלטת.</p>
+        </div>
+        <div class="plan-grid">
+            <div class="day-card">
+                <h3>ימים 1 - 5: שכבה פיזית ואפנון</h3>
+                <p><strong>נושאים:</strong> ערוצי שידור, לולאה מקומית, PSTN, קידודים (NRZ, NRZI, Manchester, 4B/5B), דיאגרמות קונסטלציה ותקורה (Overhead).</p>
+            </div>
+            <div class="day-card">
+                <h3>ימים 6 - 10: בקרת שגיאות ומסגור (Framing)</h3>
+                <p><strong>נושאים:</strong> Bit Stuffing, סיביות זוגיות מטריציוניות, קודי CRC ופולינומים יוצרים, חישובי תקורה באחוזים ותיקון שגיאות.</p>
+            </div>
+            <div class="day-card">
+                <h3>ימים 11 - 15: בקרת זרימה וערוצים משותפים</h3>
+                <p><strong>נושאים:</strong> פרוטוקולי חלון הזזה (Sliding Window), חלונות שליחה וקבלה, Additional ACKs, NAKs, CSMA/CD, CSMA-p ותורים.</p>
+            </div>
+            <div class="day-card">
+                <h3>ימים 16 - 20: שכבת הרשת וניתוב (Routing)</h3>
+                <p><strong>נושאים:</strong> אלגוריתם וקטורי מרחק (Distance Vector), ספירה לאינסוף, Link State, חישובי Subnetting מורכבים וטבלאות ניתוב (CIDR, Default).</p>
+            </div>
+            <div class="day-card">
+                <h3>ימים 21 - 25: שכבת התובלה (TCP / UDP)</h3>
+                <p><strong>נושאים:</strong> לחיצת יד משולשת (3-way handshake), דיאגרמת מצבים של TCP (ESTABLISHED, FIN_WAIT), חישוב מספרי סידוריים ואישורים (Seq/Ack), Fast Retransmission ומתקפות SYN Flood.</p>
+            </div>
+            <div class="day-card">
+                <h3>ימים 26 - 28: שכבת היישום (DNS, SMTP)</h3>
+                <p><strong>נושאים:</strong> תהליכי איתור כתובות DNS וחישוב מספר סגמנטים, פרוטוקול SMTP ופקודות תוכנה, NAT.</p>
+            </div>
+            <div class="day-card">
+                <h3>ימים 29 - 30: סימולציות מבחן מלאות במצב אמת</h3>
+                <p><strong>מטרה:</strong> פתרון 3 מבחני גמר מלאים תחת עזרים מדודים וזמן קצוב, תיקון טעויות נפוצות והידוק פתרונות בשאלות הפתוחות.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiz Tab -->
+    <div id="quiz" class="section-content">
+        <div class="filter-bar">
+            <label for="topicFilter">סנן לפי נושא:</label>
+            <select id="topicFilter" onchange="filterQuestions()">
+                <option value="all">הכל (כל הנושאים)</option>
+                <option value="physical">שכבה פיזית וקידודים</option>
+                <option value="datalink">שכבת קו נתונים ובקרת שגיאות</option>
+                <option value="transport">שכבת התובלה (TCP/UDP)</option>
+                <option value="network">שכבת הרשת וניתוב</option>
+            </select>
+        </div>
+
+        <div id="questionsContainer">
+            <!-- Question 1: From OpenU 2026ג Exam (Q1) -->
+            <div class="question-box" data-topic="physical">
+                <div class="question-header">
+                    <span>שאלה מתוך מבחן גמר 2026ג (מועד א')</span>
+                    <span class="badge">שכבה פיזית</span>
+                </div>
+                <h3>1. התייחסו לשיחת טלפון המנוהלת בין שני אנשים ב-PSTN שבה הלולאה המקומית אנלוגית ומרכזיות הקצה לחיוב דיגיטליות. איזה מבין השיטות מאפשרת המרה לאות שניתן להעביר למרכזיית החיוב?</h3>
+                <ul class="options-list">
+                    <li><label><input type="radio" name="q1" value="A"> א. FDM (Frequency Division Multiplexing)</label></li>
+                    <li><label><input type="radio" name="q1" value="B"> ב. דגימה של האות המייצג את הקול האנושי מספיק פעמים ביחידת זמן כדי להתקרב לייצוג האנלוגי</label></li>
+                    <li><label><input type="radio" name="q1" value="C"> ג. אפנון אמפליטודה</label></li>
+                    <li><label><input type="radio" name="q1" value="D"> ד. HDLC</label></li>
+                </ul>
+                <button class="btn" onclick="checkAnswer(1, 'B', 10, 'התשובה הנכונה היא ב. הקול האנושי נדגם בתדר מספיק פעמים כדי להמיר את האות האנלוגי לייצוג דיגיטלי תקני במרכזיית הקצה.')">בדוק תשובה</button>
+                <div id="feedback1" class="feedback"></div>
+            </div>
+
+            <!-- Question 2: From OpenU 2026ג Exam (Q2) -->
+            <div class="question-box" data-topic="physical">
+                <div class="question-header">
+                    <span>שאלה מתוך מבחן גמר 2026ג (מועד א')</span>
+                    <span class="badge">שכבה פיזית</span>
+                </div>
+                <h3>2. סדרת הסיביות 010101010101 מיוצגת בקידוד NRZI. אורך מחזור שעון הוא $t$ מיקרו-שניות. מהו אורך הזמן המירבי במיקרו-שניות שבו תהיה רמת מתח קבועה?</h3>
+                <ul class="options-list">
+                    <li><label><input type="radio" name="q2" value="A"> א. 0.5</label></li>
+                    <li><label><input type="radio" name="q2" value="B"> ב. 1</label></li>
+                    <li><label><input type="radio" name="q2" value="C"> ג. 1.5</label></li>
+                    <li><label><input type="radio" name="q2" value="D"> ד. 2</label></li>
+                </ul>
+                <button class="btn" onclick="checkAnswer(2, 'C', 10, 'התשובה היא 1.5. יש לנו $t/2$ של סיבית 1 לפני השינוי, עוד $t$ שלם של הסיבית 0, ועוד $t/2$ של הסיבית 1 הבאה, סך הכל 1.5t.')">בדוק תשובה</button>
+                <div id="feedback2" class="feedback"></div>
+            </div>
+
+            <!-- Question 3: From OpenU 2026ג Exam (Q9 - TCP) -->
+            <div class="question-box" data-topic="transport">
+                <div class="question-header">
+                    <span>שאלה מתוך מבחן גמר 2026ג (מועד א')</span>
+                    <span class="badge">שכבת התובלה</span>
+                </div>
+                <h3>3. פרוטוקול TCP בין הוסט A ל-B. הלקוח A שולח 3 סגמנטים: (1) גודל M=1400, Seq=1800; (2) גודל S=250; (3) גודל L=600. אחרי שליחת הסגמנט השני ולפני השלישי, מתקבל אצל A אישור ACK עם המספר y. האם ניתן לדעת את y?</h3>
+                <textarea id="q3_text" rows="3" placeholder="הקלד את תשובתך והסברך המלא..."></textarea>
+                <button class="btn" onclick="checkOpenAnswer(3, 10, 'לא ניתן לדעת, משום שיתכן שהתקבל אישור רק לסגמנט הראשון (ואז y=3200) או לשני הסגמנטים יחד (ואז y=3450).')">הצג פתרון מלא</button>
+                <div id="feedback3" class="feedback"></div>
+            </div>
+
+            <!-- Question 4: Additional practice on Subnetting -->
+            <div class="question-box" data-topic="network">
+                <div class="question-header">
+                    <span>שאלת תרגרול מורחבת (רמת בחינה)</span>
+                    <span class="badge">שכבת הרשת</span>
+                </div>
+                <h3>4. נתון מרחב כתובות 182.168.75.0/24. עליך לחלק אותו לשתי רשתות נפרדות כך שתומכות ב-60 הוסטים כל אחת. מהו המסכה (Subnet Mask) הנדרשת עבור החלוקה?</h3>
+                <ul class="options-list">
+                    <li><label><input type="radio" name="q4" value="A"> א. /24</label></li>
+                    <li><label><input type="radio" name="q4" value="B"> ב. /25</label></li>
+                    <li><label><input type="radio" name="q4" value="C"> ג. /26</label></li>
+                    <li><label><input type="radio" name="q4" value="D"> ד. /27</label></li>
+                </ul>
+                <button class="btn" onclick="checkAnswer(4, 'C', 10, 'התשובה הנכונה היא ג (/26). כדי לתמוך ב-60 הוסטים נדרשים לפחות 6 ביטים להוסטים ($2^6 - 2 = 62$), כלומר 32 - 6 = 26 ביטים לרשת.')">בדוק תשובה</button>
+                <div id="feedback4" class="feedback"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Tab -->
+    <div id="stats" class="section-content">
+        <div class="stats-dashboard">
+            <div class="stat-card">
+                <h3 id="scoreDisplay">0</h3>
+                <p>ציון מצטבר נוכחי</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="solvedCount">0 / 4</h3>
+                <p>שאלות שענית עליהן</p>
+            </div>
+            <div class="stat-card">
+                <h3>100</h3>
+                <p>היעד שלך למבחן</p>
+            </div>
+        </div>
+        <div class="card">
+            <h2>ניתוח ביצועים</h2>
+            <p id="statsMessage">התחל לפתור שאלות בלשונית "מאגר שאלות" כדי לקבל ניתוח מפורט של רמת השליטה שלך בכל נושא.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    let userScore = 0;
+    let solvedQuestions = new Set();
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.section-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    function checkAnswer(qNum, correctOpt, points, explanation) {
+        const selected = document.querySelector(`input[name="q${qNum}"]:checked`);
+        const fb = document.getElementById(`feedback${qNum}`);
+        fb.style.display = 'block';
+        
+        if (!selected) {
+            fb.className = 'feedback incorrect';
+            fb.innerHTML = 'אנא בחר תשובה לפני הבדיקה.';
+            return;
+        }
+
+        if (selected.value === correctOpt) {
+            fb.className = 'feedback correct';
+            fb.innerHTML = `<strong>תשובה נכונה! (+${points} נקודות)</strong><br>${explanation}`;
+            if (!solvedQuestions.has(qNum)) {
+                solvedQuestions.add(qNum);
+                userScore += points;
+                updateStats();
+            }
+        } else {
+            fb.className = 'feedback incorrect';
+            fb.innerHTML = `<strong>תשובה שגורה.</strong><br>${explanation}`;
+        }
+    }
+
+    function checkOpenAnswer(qNum, points, explanation) {
+        const fb = document.getElementById(`feedback${qNum}`);
+        fb.style.display = 'block';
+        fb.className = 'feedback correct';
+        fb.innerHTML = `<strong>הסבר ופתרון מודל:</strong><br>${explanation}`;
+        if (!solvedQuestions.has(qNum)) {
+            solvedQuestions.add(qNum);
+            userScore += points;
+            updateStats();
+        }
+    }
+
+    function updateStats() {
+        document.getElementById('scoreDisplay').innerText = userScore;
+        document.getElementById('solvedCount').innerText = `${solvedQuestions.size} / 4`;
+        if (solvedQuestions.size >= 3) {
+            document.getElementById('statsMessage').innerText = 'התרשמות מעולה! אתה נמצא במסלול הבטוח לציון 100 במבחן.';
+        }
+    }
+
+    function filterQuestions() {
+        const selectedTopic = document.getElementById('topicFilter').value;
+        const boxes = document.querySelectorAll('.question-box');
+        boxes.forEach(box => {
+            if (selectedTopic === 'all' || box.getAttribute('data-topic') === selectedTopic) {
+                box.style.display = 'block';
+            } else {
+                box.style.display = 'none';
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
